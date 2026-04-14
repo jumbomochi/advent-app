@@ -12,6 +12,24 @@ export function MediaMystery({
 }: { photos: Photo[]; correctIndex: number; onContinue: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   const revealed = selected === correctIndex;
+  const noPhotos = photos.length === 0;
+
+  if (noPhotos) {
+    return (
+      <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
+        <h2 className="font-display text-3xl text-center text-accent">What is Daddy looking at?</h2>
+        <div className="aspect-video rounded-2xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body">
+          Daddy&apos;s mystery photos are coming soon 💌
+        </div>
+        <button
+          onClick={onContinue}
+          className="p-3 rounded-xl bg-accent text-white font-display text-2xl border-[3px] border-ink shadow-[3px_3px_0_var(--color-ink)] active:translate-y-[2px] active:shadow-[1px_1px_0_var(--color-ink)]"
+        >
+          Continue
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
