@@ -8,8 +8,8 @@ type Photo = {
 };
 
 export function MediaMystery({
-  photos, correctIndex, onContinue,
-}: { photos: Photo[]; correctIndex: number; onContinue: () => void }) {
+  photos, correctIndex, funFact, onContinue,
+}: { photos: Photo[]; correctIndex: number; funFact?: string; onContinue: () => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   const revealed = selected === correctIndex;
   const noPhotos = photos.length === 0;
@@ -60,6 +60,11 @@ export function MediaMystery({
         revealed
           ? <div className="p-3 rounded-xl bg-grass/40 border-[2px] border-ink font-display text-xl text-center">🎉 Yes! {photos[correctIndex]?.label ?? ""}</div>
           : <div className="p-3 rounded-xl bg-sun/40 border-[2px] border-ink font-body text-sm text-center">Not quite — try another!</div>
+      )}
+      {revealed && funFact && (
+        <div className="p-4 rounded-xl bg-white border-[3px] border-ink shadow-[3px_3px_0_var(--color-ink)] font-body text-sm leading-relaxed whitespace-pre-wrap">
+          {funFact}
+        </div>
       )}
       <button
         onClick={onContinue}

@@ -32,6 +32,7 @@ type RevealPayload = {
   media_config: {
     photos?: Photo[];
     correct_index?: number;
+    fun_fact?: string;
     text?: string;
     emoji?: string;
     colors?: string[];
@@ -129,6 +130,7 @@ export default function DayPage() {
             <MediaMystery
               photos={reveal.media_config.photos ?? []}
               correctIndex={reveal.media_config.correct_index ?? 0}
+              funFact={reveal.media_config.fun_fact}
               onContinue={() => setStep("jigsaw")}
             />
           )}
