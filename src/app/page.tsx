@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { headers } from "next/headers";
 import { DoorGrid, type Door } from "@/components/DoorGrid";
 import { TripMapJigsaw } from "@/components/TripMapJigsaw";
@@ -41,7 +42,10 @@ export default async function Home() {
   return (
     <main className="min-h-screen p-4 pb-10">
       <header className="flex justify-between items-center max-w-md mx-auto gap-2">
-        <h1 className="font-display text-3xl text-accent flex-1">✈️ Where&apos;s Daddy?</h1>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <Image src="/brand/logo.png" alt="" width={40} height={40} priority />
+          <h1 className="font-display text-3xl text-accent truncate">Where&apos;s Daddy?</h1>
+        </div>
         <span className="px-3 py-1 rounded-full border-[2px] border-ink bg-sun font-display text-lg shadow-[2px_2px_0_var(--color-ink)]">
           ⭐ {totalPoints}
         </span>

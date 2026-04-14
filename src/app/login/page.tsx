@@ -1,5 +1,6 @@
 "use client";
 import { useState, Suspense } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginInner() {
@@ -49,7 +50,10 @@ function LoginInner() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm grid gap-5">
-        <h1 className="text-center font-display text-5xl text-accent">✈️ Where&apos;s Daddy?</h1>
+        <div className="flex flex-col items-center gap-2">
+          <Image src="/brand/logo.png" alt="Where's Daddy logo" width={140} height={140} priority className="drop-shadow-[4px_4px_0_rgba(15,23,42,0.15)]" />
+          <h1 className="text-center font-display text-5xl text-accent">Where&apos;s Daddy?</h1>
+        </div>
 
         <form
           onSubmit={submitPin}
