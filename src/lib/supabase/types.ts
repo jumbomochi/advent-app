@@ -34,6 +34,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_pin: {
+        Row: {
+          id: number
+          pin_hash: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          pin_hash: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          pin_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           email: string

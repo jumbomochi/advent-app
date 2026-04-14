@@ -1,15 +1,24 @@
 "use client";
 import { useState } from "react";
 
-export function PinRotator() {
+type Variant = "kid" | "admin";
+
+export function PinRotator({
+  variant = "kid",
+}: { variant?: Variant } = {}) {
   const [pin, setPin] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "err">("idle");
+  const digits = variant === "admin" ? 6 : 4;
+  const endpoint = variant === "admin" ? "/api/admin/admin-pin" : "/api/admin/pin";
+  const label = variant === "admin" ? "New 6-digit parent PIN" : "New 4-digit kid PIN";
+  const regex = variant === "admin" ? /^\d{6}$/ : /^\d{4}$/;
+  const spacing = variant === "admin" ? "tracking-[0.3em]" : "tracking-[0.4em]";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!/^\d{4}$/.test(pin)) return;
+    if (!regex.test(pin)) return;
     setStatus("saving");
-    const res = await fetch("/api/admin/pin", {
+    const res = await fetch(endpoint, {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ new_pin: pin }),
@@ -21,18 +30,18 @@ export function PinRotator() {
   return (
     <form onSubmit={submit} className="flex items-end gap-2 max-w-xs">
       <label className="grid gap-1 flex-1">
-        <span className="text-xs text-neutral-500">New 4-digit PIN</span>
+        <span className="text-xs text-neutral-500">{label}</span>
         <input
           value={pin}
-          onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, digits))}
           inputMode="numeric"
-          maxLength={4}
-          className="bg-white border border-neutral-300 rounded p-2 text-center tracking-[0.4em] font-mono"
+          maxLength={digits}
+          className={`bg-white border border-neutral-300 rounded p-2 text-center font-mono ${spacing}`}
         />
       </label>
       <button
         type="submit"
-        disabled={pin.length !== 4 || status === "saving"}
+        disabled={pin.length !== digits || status === "saving"}
         className="px-4 py-2 rounded bg-blue-600 text-white font-medium disabled:opacity-50"
       >
         Rotate

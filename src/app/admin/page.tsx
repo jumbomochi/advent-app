@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { adminClient } from "@/lib/supabase/admin";
-import { getAdminEmail } from "@/lib/guards/admin";
+import { isAdmin } from "@/lib/guards/admin";
 import { PinRotator } from "@/components/admin/PinRotator";
 import { LogoutButton } from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHome() {
-  const email = await getAdminEmail();
-  if (!email) redirect("/login");
+  if (!(await isAdmin())) redirect("/login");
 
   const sb = adminClient();
   const [{ data: days }, { data: completions }] = await Promise.all([
@@ -23,10 +22,7 @@ export default async function AdminHome() {
     <main className="min-h-screen bg-neutral-50 text-neutral-900 p-6 max-w-3xl mx-auto">
       <header className="flex justify-between items-center mb-6 gap-3">
         <h1 className="text-2xl font-bold">Admin — Where&apos;s Daddy?</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-neutral-500">{email}</span>
-          <LogoutButton variant="admin" />
-        </div>
+        <LogoutButton variant="admin" />
       </header>
 
       <section className="grid gap-3">
@@ -52,9 +48,15 @@ export default async function AdminHome() {
         ))}
       </section>
 
-      <section className="mt-10 pt-6 border-t border-neutral-200">
-        <h2 className="font-semibold mb-3">Rotate Kid PIN</h2>
-        <PinRotator />
+      <section className="mt-10 pt-6 border-t border-neutral-200 grid gap-6">
+        <div>
+          <h2 className="font-semibold mb-3">Rotate Kid PIN</h2>
+          <PinRotator variant="kid" />
+        </div>
+        <div>
+          <h2 className="font-semibold mb-3">Rotate Parent PIN</h2>
+          <PinRotator variant="admin" />
+        </div>
       </section>
     </main>
   );

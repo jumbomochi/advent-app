@@ -10,9 +10,11 @@ function LoginInner() {
   const [pin, setPin] = useState("");
   const [err, setErr] = useState("");
   const [shaking, setShaking] = useState(false);
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [adminPin, setAdminPin] = useState("");
+  const [adminErr, setAdminErr] = useState("");
+  const [adminShaking, setAdminShaking] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [adminBusy, setAdminBusy] = useState(false);
 
   async function submitPin(e: React.FormEvent) {
     e.preventDefault();
@@ -33,18 +35,23 @@ function LoginInner() {
     }
   }
 
-  async function submitEmail(e: React.FormEvent) {
+  async function submitAdminPin(e: React.FormEvent) {
     e.preventDefault();
-    const { createBrowserClient } = await import("@supabase/ssr");
-    const sb = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
-    await sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${location.origin}/auth/callback?next=/admin` },
+    setAdminErr("");
+    setAdminBusy(true);
+    const res = await fetch("/api/admin-auth", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ pin: adminPin }),
     });
-    setSent(true);
+    setAdminBusy(false);
+    if (res.ok) router.push("/admin");
+    else {
+      setAdminShaking(true);
+      setTimeout(() => setAdminShaking(false), 320);
+      if (res.status === 429) setAdminErr("Too many tries. Wait 15 minutes and try again.");
+      else setAdminErr("Wrong PIN.");
+    }
   }
 
   return (
@@ -81,19 +88,27 @@ function LoginInner() {
 
         <details className="p-4 rounded-2xl bg-white/60 border-[2px] border-ink/30">
           <summary className="cursor-pointer text-sm font-medium text-ink/70">Parent login</summary>
-          <form onSubmit={submitEmail} className="mt-3 grid gap-2">
+          <form
+            onSubmit={submitAdminPin}
+            className={`mt-3 grid gap-2 ${adminShaking ? "animate-shake" : ""}`}
+          >
             <input
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-paper p-2 rounded-lg border-[2px] border-ink text-sm"
+              value={adminPin}
+              onChange={(e) => setAdminPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              pattern="\d{6}"
+              maxLength={6}
+              placeholder="6-digit PIN"
+              className="bg-paper p-2 rounded-lg border-[2px] border-ink text-center tracking-[0.35em] font-mono"
+              aria-label="Parent PIN"
             />
-            <button className="p-2 rounded-lg bg-sky text-ink font-medium border-[2px] border-ink text-sm">
-              Send magic link
+            <button
+              disabled={adminBusy || adminPin.length !== 6}
+              className="p-2 rounded-lg bg-sky text-ink font-medium border-[2px] border-ink text-sm disabled:opacity-40 disabled:pointer-events-none"
+            >
+              {adminBusy ? "Checking..." : "Enter"}
             </button>
-            {sent && <p className="text-grass text-sm">Check your email.</p>}
+            {adminErr && <p className="text-accent text-sm font-medium">{adminErr}</p>}
           </form>
         </details>
       </div>

@@ -8,16 +8,8 @@ export function LogoutButton({ variant = "kid" }: { variant?: "kid" | "admin" })
 
   async function logout() {
     setBusy(true);
-    if (variant === "kid") {
-      await fetch("/api/kid-auth/logout", { method: "POST" });
-    } else {
-      const { createBrowserClient } = await import("@supabase/ssr");
-      const sb = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
-      await sb.auth.signOut();
-    }
+    const url = variant === "kid" ? "/api/kid-auth/logout" : "/api/admin-auth/logout";
+    await fetch(url, { method: "POST" });
     router.push("/login");
     router.refresh();
   }

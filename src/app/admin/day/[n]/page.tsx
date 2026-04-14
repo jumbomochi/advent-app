@@ -1,5 +1,5 @@
 import { adminClient } from "@/lib/supabase/admin";
-import { getAdminEmail } from "@/lib/guards/admin";
+import { isAdmin } from "@/lib/guards/admin";
 import { redirect, notFound } from "next/navigation";
 import { DayEditForm } from "@/components/admin/DayEditForm";
 import Link from "next/link";
@@ -7,8 +7,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function EditDay({ params }: { params: Promise<{ n: string }> }) {
-  const email = await getAdminEmail();
-  if (!email) redirect("/login");
+  if (!(await isAdmin())) redirect("/login");
 
   const { n: nParam } = await params;
   const n = Number(nParam);

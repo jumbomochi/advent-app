@@ -8,7 +8,7 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/kid-auth") ||
-    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/api/admin-auth") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
     pathname.startsWith("/jigsaw") ||

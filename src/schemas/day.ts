@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const PinSchema = z.object({ pin: z.string().regex(/^\d{4}$/) });
+export const AdminPinSchema = z.object({ pin: z.string().regex(/^\d{6}$/) });
 
 export const DayPatch = z.object({
   activity_type: z.enum(["riddle", "quiz", "creative", "kindness"]).optional(),
@@ -15,3 +16,4 @@ export const DayPatch = z.object({
 });
 
 export const NewPinSchema = z.object({ new_pin: z.string().regex(/^\d{4}$/) });
+export const NewAdminPinSchema = z.object({ new_pin: z.string().regex(/^\d{6}$/) });
