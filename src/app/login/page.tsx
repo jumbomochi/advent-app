@@ -49,7 +49,7 @@ function LoginInner() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm grid gap-5">
-        <h1 className="text-center font-display text-5xl text-accent">🎁 Daddy&apos;s Advent</h1>
+        <h1 className="text-center font-display text-5xl text-accent">✈️ Where&apos;s Daddy?</h1>
 
         <form
           onSubmit={submitPin}

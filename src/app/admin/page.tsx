@@ -21,7 +21,7 @@ export default async function AdminHome() {
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900 p-6 max-w-3xl mx-auto">
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Admin — Daddy&apos;s Advent</h1>
+        <h1 className="text-2xl font-bold">Admin — Where&apos;s Daddy?</h1>
         <span className="text-sm text-neutral-500">Signed in as {email}</span>
       </header>
 

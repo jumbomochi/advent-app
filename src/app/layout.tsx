@@ -16,7 +16,7 @@ const body = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Daddy's Advent",
+  title: "Where's Daddy?",
   description: "9 days of surprises while Daddy's away.",
 };
 

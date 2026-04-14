@@ -40,7 +40,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen p-4 pb-10">
       <header className="flex justify-between items-center max-w-md mx-auto">
-        <h1 className="font-display text-3xl text-accent">🎁 Daddy&apos;s Advent</h1>
+        <h1 className="font-display text-3xl text-accent">✈️ Where&apos;s Daddy?</h1>
         <span className="px-3 py-1 rounded-full border-[2px] border-ink bg-sun font-display text-lg shadow-[2px_2px_0_var(--color-ink)]">
           ⭐ {totalPoints}
         </span>
