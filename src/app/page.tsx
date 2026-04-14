@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { DoorGrid, type Door } from "@/components/DoorGrid";
 import { TripMapJigsaw } from "@/components/TripMapJigsaw";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { LogoutButton } from "@/components/LogoutButton";
 import { adminClient } from "@/lib/supabase/admin";
 import { TOTAL_DAYS } from "@/lib/constants";
 
@@ -39,11 +40,12 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen p-4 pb-10">
-      <header className="flex justify-between items-center max-w-md mx-auto">
-        <h1 className="font-display text-3xl text-accent">✈️ Where&apos;s Daddy?</h1>
+      <header className="flex justify-between items-center max-w-md mx-auto gap-2">
+        <h1 className="font-display text-3xl text-accent flex-1">✈️ Where&apos;s Daddy?</h1>
         <span className="px-3 py-1 rounded-full border-[2px] border-ink bg-sun font-display text-lg shadow-[2px_2px_0_var(--color-ink)]">
           ⭐ {totalPoints}
         </span>
+        <LogoutButton />
       </header>
 
       <DoorGrid doors={doors} todayNumber={todayNumber} />

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { adminClient } from "@/lib/supabase/admin";
 import { getAdminEmail } from "@/lib/guards/admin";
 import { PinRotator } from "@/components/admin/PinRotator";
+import { LogoutButton } from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -20,9 +21,12 @@ export default async function AdminHome() {
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900 p-6 max-w-3xl mx-auto">
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center mb-6 gap-3">
         <h1 className="text-2xl font-bold">Admin — Where&apos;s Daddy?</h1>
-        <span className="text-sm text-neutral-500">Signed in as {email}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-neutral-500">{email}</span>
+          <LogoutButton variant="admin" />
+        </div>
       </header>
 
       <section className="grid gap-3">
