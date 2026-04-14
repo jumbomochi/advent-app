@@ -41,7 +41,7 @@ function LoginInner() {
     );
     await sb.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/admin` },
+      options: { emailRedirectTo: `${location.origin}/auth/callback?next=/admin` },
     });
     setSent(true);
   }
