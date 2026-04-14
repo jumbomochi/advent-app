@@ -73,18 +73,21 @@ export type Database = {
       completions: {
         Row: {
           completed_at: string
+          coupon_redeemed_at: string | null
           day_number: number
           notes: string | null
           photo_storage_path: string | null
         }
         Insert: {
           completed_at?: string
+          coupon_redeemed_at?: string | null
           day_number: number
           notes?: string | null
           photo_storage_path?: string | null
         }
         Update: {
           completed_at?: string
+          coupon_redeemed_at?: string | null
           day_number?: number
           notes?: string | null
           photo_storage_path?: string | null
