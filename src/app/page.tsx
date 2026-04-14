@@ -4,6 +4,7 @@ import { DoorGrid, type Door } from "@/components/DoorGrid";
 import { TripMapJigsaw } from "@/components/TripMapJigsaw";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LogoutButton } from "@/components/LogoutButton";
+import { CouponInventory } from "@/components/CouponInventory";
 import { adminClient } from "@/lib/supabase/admin";
 import { TOTAL_DAYS } from "@/lib/constants";
 
@@ -62,6 +63,8 @@ export default async function Home() {
         <h2 className="font-display text-2xl text-center mb-2 text-accent">Daddy&apos;s Journey</h2>
         <TripMapJigsaw state={jigsawState} />
       </section>
+
+      <CouponInventory />
     </main>
   );
 }
