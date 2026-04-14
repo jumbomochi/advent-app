@@ -120,7 +120,13 @@ export default function DayPage() {
           body={reveal.activity_body}
           correctAnswer={reveal.correct_answer_canonical}
           photoUrl={reveal.photo_signed_url}
-          onContinue={() => setStep(day.kid_tile_completed ? "coupon" : "media")}
+          mediaType={reveal.media_type}
+          mediaSignedUrl={reveal.media_signed_url}
+          mediaConfig={reveal.media_config}
+          couponText={reveal.coupon_text}
+          points={reveal.points}
+          kidTileCompleted={day.kid_tile_completed}
+          onContinue={() => setStep("jigsaw")}
         />
       )}
 
