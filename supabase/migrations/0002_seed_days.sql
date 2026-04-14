@@ -10,4 +10,4 @@ insert into days (day_number, date, unlock_at, activity_type, activity_title, ac
   (9, '2026-04-25', '2026-04-25 15:00+08', 'riddle',   '[TODO: title]', '[TODO: riddle body]', '[TODO]', 10, 'montage',           '[TODO: coupon]', 20);
 
 -- Initial PIN: 1234 (MUST be rotated via admin UI in production)
-insert into household_pin (id, pin_hash) values (1, '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+insert into household_pin (id, pin_hash) values (1, '$2b$10$f51nBOcahe2CScN.uxo.guBKTMSKCtedbPM9whi7Qv9krHppM5g7m');
