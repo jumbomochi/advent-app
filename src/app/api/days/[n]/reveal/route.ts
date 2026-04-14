@@ -35,8 +35,18 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
     return NextResponse.json({ error: "locked" }, { status: 403 });
   }
 
-  const { data: completion } = await sb.from("completions").select("day_number").eq("day_number", n).maybeSingle();
+  const { data: completion } = await sb.from("completions").select("day_number,photo_storage_path").eq("day_number", n).maybeSingle();
   if (!completion) return NextResponse.json({ error: "not completed" }, { status: 403 });
+
+  let photo_signed_url: string | null = null;
+  if (completion.photo_storage_path) {
+    const { data } = await sb.storage.from("photos").createSignedUrl(completion.photo_storage_path, SIGNED_URL_TTL);
+    photo_signed_url = data?.signedUrl ?? null;
+  }
+
+  const correct_answer_canonical = day.activity_answer
+    ? day.activity_answer.split("|")[0] ?? null
+    : null;
 
   let media_signed_url: string | null = null;
   if ((day.media_type === "video" || day.media_type === "montage") && day.media_storage_path) {
@@ -75,5 +85,10 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
     jigsaw_state: Array.from({ length: TOTAL_DAYS }, (_, i) =>
       (tiledDays ?? []).some((r) => r.day_number === i + 1),
     ),
+    activity_title: day.activity_title,
+    activity_body: day.activity_body,
+    activity_type: day.activity_type,
+    correct_answer_canonical,
+    photo_signed_url,
   });
 }

@@ -10,6 +10,7 @@ import { MediaPostcard } from "@/components/reveal/MediaPostcard";
 import { JigsawPieceStep } from "@/components/reveal/JigsawPieceStep";
 import { CouponStep } from "@/components/reveal/CouponStep";
 import { BigSurpriseStep } from "@/components/reveal/BigSurpriseStep";
+import { Recap } from "@/components/reveal/Recap";
 
 type ActivityType = "riddle" | "quiz" | "creative" | "kindness";
 type MediaType = "video" | "mystery_photos" | "animated_postcard" | "montage";
@@ -40,9 +41,14 @@ type RevealPayload = {
   coupon_text: string;
   points: number;
   final_reward_unlocked: boolean;
+  activity_title: string;
+  activity_body: string;
+  activity_type: ActivityType;
+  correct_answer_canonical: string | null;
+  photo_signed_url: string | null;
 };
 
-type Step = "loading" | "activity" | "media" | "jigsaw" | "coupon" | "big_surprise" | "done";
+type Step = "loading" | "activity" | "recap" | "media" | "jigsaw" | "coupon" | "big_surprise" | "done";
 
 export default function DayPage() {
   const params = useParams<{ n: string }>();
@@ -71,8 +77,7 @@ export default function DayPage() {
         const rv = await fetch(`/api/days/${n}/reveal`).then((x) => x.json()) as RevealPayload;
         if (cancelled) return;
         setReveal(rv);
-        // If already completed + piece placed, resume from coupon. Otherwise from media.
-        setStep(d.kid_tile_completed ? "coupon" : "media");
+        setStep("recap");
       } else {
         setStep("activity");
       }
@@ -105,6 +110,18 @@ export default function DayPage() {
 
       {step === "loading" && (
         <p className="text-center mt-10 font-body opacity-60">Loading…</p>
+      )}
+
+      {step === "recap" && day && reveal && (
+        <Recap
+          dayNumber={n}
+          activityType={reveal.activity_type}
+          title={reveal.activity_title}
+          body={reveal.activity_body}
+          correctAnswer={reveal.correct_answer_canonical}
+          photoUrl={reveal.photo_signed_url}
+          onContinue={() => setStep(day.kid_tile_completed ? "coupon" : "media")}
+        />
       )}
 
       {step === "activity" && day && (
