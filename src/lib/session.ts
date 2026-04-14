@@ -15,7 +15,7 @@ export async function setKidSession() {
   const c = await cookies();
   c.set(COOKIE_NAME, sealed, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: MAX_AGE_SECONDS,
