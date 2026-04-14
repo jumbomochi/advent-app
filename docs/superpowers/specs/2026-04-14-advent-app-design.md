@@ -58,7 +58,7 @@ The piece becomes available only after the main activity is completed, so the tw
 
 A staged flow (not a single screen — each step transitions with a tap/continue):
 
-1. **Media step** — plays the day's media asset. Normally a short travel clip (10–30 sec) from where Dad is/was. On designated **special days** (see below) the media is different: Day 5 = Grandma voice note with still image, Day 7 = animated postcard graphic, Day 9 = montage of all travel clips stitched together.
+1. **Media step** — plays the day's media asset. Normally a short travel clip (10–30 sec) from where Dad is/was. On designated **special days** (see below) the media is different: Day 5 = interactive "mystery photos" (3 close-ups, kid guesses, full-view reveals), Day 7 = animated postcard graphic, Day 9 = montage of all travel clips stitched together.
 2. **Jigsaw piece step** — loose piece appears; 4yo taps/drags it into place on a mini trip-map puzzle. Snaps in with an animation. Records `kid_tile_completion`.
 3. **Coupon + points step** — shows coupon text (e.g., "🍦 Ice cream after dinner") and points earned. Includes a "Show Mummy" button that does nothing beyond ceremony.
 
@@ -125,12 +125,11 @@ Seeded with all 9 rows at migration time.
 | `activity_body` | `text NOT NULL` | Markdown rendered client-side |
 | `activity_answer` | `text` | NULL for creative/kindness; `\|`-separated alternates allowed for riddle/quiz |
 | `expected_minutes` | `int NOT NULL DEFAULT 15` | Authoring hint; 5/15/30 typical |
-| `media_type` | `text NOT NULL CHECK (media_type IN ('video','audio_with_image','animated_postcard','montage'))` | Drives reveal step 1 rendering |
+| `media_type` | `text NOT NULL CHECK (media_type IN ('video','mystery_photos','animated_postcard','montage'))` | Drives reveal step 1 rendering |
 | `coupon_text` | `text NOT NULL` | |
 | `points` | `int NOT NULL DEFAULT 10` | |
-| `media_storage_path` | `text` | NULL if not uploaded yet. Video/audio file key. |
-| `media_still_path` | `text` | Optional poster image / still shown for audio days |
-| `postcard_config` | `jsonb` | Only used when `media_type = 'animated_postcard'`; holds text/emoji/colors |
+| `media_storage_path` | `text` | NULL if not uploaded yet. Video file key (used by `video` and `montage`). |
+| `media_config` | `jsonb` | Type-specific payload: `mystery_photos` → `{photos: [{close_up_path, full_path, label}], correct_index}`; `animated_postcard` → `{text, emoji, colors}` |
 
 ### `completions`
 | Column | Type | Notes |
@@ -184,8 +183,8 @@ Append-only.
 
 ### Storage buckets
 
-- `media/` (private) — per-day reveal asset (video or audio), convention: `day-{n}.{ext}`
-- `stills/` (private) — optional poster/still images for audio days, convention: `day-{n}-still.jpg`
+- `media/` (private) — per-day reveal asset (video), convention: `day-{n}.{ext}`
+- `mystery/` (private) — close-up + full-view pairs for mystery-photo days, convention: `day-{n}-{i}-{close|full}.jpg`
 - `photos/` (private) — kid creative uploads, convention: `day-{n}-{timestamp}.jpg`
 
 All access via server-issued signed URLs. No public buckets.
@@ -210,7 +209,7 @@ All routes are Next.js route handlers. Server-only; no direct client writes to S
 | `/api/days/[n]/creative` | POST | Multipart upload. Server writes to `photos/` bucket, inserts `completions` row with `photo_storage_path`. |
 | `/api/days/[n]/kindness` | POST | Inserts `completions` row. |
 | `/api/days/[n]/kid-tile` | POST | Inserts `kid_tile_completions` row for day `n`. Idempotent. Requires `completions` row already present for day `n` (main activity must come first). |
-| `/api/days/[n]/reveal` | GET | Returns `{media_type, media_signed_url, media_still_signed_url, postcard_config, coupon_text, points, final_reward_unlocked, jigsaw_state}`. 403 if not completed or not unlocked. Signed URL TTL: 1 hour. `final_reward_unlocked` is `true` only when `n=9` AND jigsaw complete AND total points ≥ 100. |
+| `/api/days/[n]/reveal` | GET | Returns `{media_type, media_signed_url, media_config, coupon_text, points, final_reward_unlocked, jigsaw_state}`. For `mystery_photos`, `media_config.photos` contains close-up and full-view signed URLs. 403 if not completed or not unlocked. Signed URL TTL: 1 hour. `final_reward_unlocked` is `true` only when `n=9` AND jigsaw complete AND total points ≥ 100. |
 
 ### Admin routes
 
@@ -220,8 +219,8 @@ All gated by Supabase session + `admin_users` membership check (middleware).
 |---|---|---|
 | `/api/admin/days` | GET | Full 9-day array including answers. |
 | `/api/admin/days/[n]` | PUT | Body is a day patch (Zod-validated). |
-| `/api/admin/days/[n]/media` | POST | Multipart upload to `media/` bucket, sets `media_storage_path`. Accepts `mp4\|webm\|mov\|m4a\|mp3`, ≤200MB. |
-| `/api/admin/days/[n]/still` | POST | Optional upload to `stills/` bucket (used for audio days). Accepts `jpg\|png\|webp`, ≤10MB. |
+| `/api/admin/days/[n]/media` | POST | Multipart upload to `media/` bucket, sets `media_storage_path`. Accepts `mp4\|webm\|mov`, ≤200MB. Used by `video` and `montage` types. |
+| `/api/admin/days/[n]/mystery` | POST | Multipart upload for a single close-up/full pair + label + correctness flag; appends to `media_config.photos`. |
 | `/api/admin/days/[n]/override` | POST | Sets `unlock_at = now()`. |
 | `/api/admin/days/[n]/reset` | POST | Deletes `completions` and `kid_tile_completions` rows for that day. |
 | `/api/admin/pin` | PUT | Body `{new_pin}`. Bcrypts and stores. |
@@ -275,7 +274,7 @@ Content authored in admin UI post-deploy. Seed migration inserts placeholder str
 | 2 | Sat 18 Apr | creative | "Draw a San Francisco landmark" — upload photo | 20 min | video | Pre-recorded before trip OR Golden Gate clip if captured Day 1 |
 | 3 | Sun 19 Apr | quiz | 5-question geography quiz (SFO/LAS/time zones) | 10 min | video | Pre-recorded before trip |
 | 4 | Mon 20 Apr | kindness | "Write a thank-you note to Grandma" | 15 min | video | Fresh — landmark clip from Vegas (ATP) |
-| 5 | Tue 21 Apr | riddle | Cryptic puzzle about Google | 10 min | **audio_with_image** | **Grandma voice note** + still image of Grandma |
+| 5 | Tue 21 Apr | riddle | Cryptic puzzle about Google | 10 min | **mystery_photos** | **3 close-up photos** (Google HQ signage, Sphere detail, Next keynote sign) — kid picks the one matching the riddle answer, full-view reveals |
 | 6 | Wed 22 Apr | creative | "Design a patch for Dad's luggage" — draw + upload | 20 min | video | Fresh — The Sphere or Next keynote clip |
 | 7 | Thu 23 Apr | quiz | Fun facts from Google Next | 10 min | **animated_postcard** | **Silly postcard graphic** with souvenir fact (no video needed) |
 | 8 | Fri 24 Apr | kindness | "Do something nice for your little sister" | 15 min | video | Fresh — departing-Vegas clip |
