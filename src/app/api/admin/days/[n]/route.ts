@@ -5,7 +5,8 @@ import { DayPatch } from "@/schemas/day";
 import type { Json, TablesUpdate } from "@/lib/supabase/types";
 
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ n: string }> }) {
-  const email = await requireAdmin();
+  const { email, denied } = await requireAdmin();
+  if (denied) return denied;
   const n = Number((await ctx.params).n);
   const parsed = DayPatch.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "bad body", details: parsed.error.issues }, { status: 400 });

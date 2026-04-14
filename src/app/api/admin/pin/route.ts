@@ -5,7 +5,8 @@ import { hashPin } from "@/lib/pin";
 import { NewPinSchema } from "@/schemas/day";
 
 export async function PUT(req: NextRequest) {
-  const email = await requireAdmin();
+  const { email, denied } = await requireAdmin();
+  if (denied) return denied;
   const parsed = NewPinSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "bad pin" }, { status: 400 });
   const sb = adminClient();

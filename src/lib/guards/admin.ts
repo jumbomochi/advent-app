@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { serverClient } from "@/lib/supabase/server";
 import { env } from "@/lib/env";
 
@@ -10,8 +11,10 @@ export async function getAdminEmail(): Promise<string | null> {
   return email;
 }
 
-export async function requireAdmin(): Promise<string> {
+export async function requireAdmin(): Promise<{ email: string; denied: null } | { email: null; denied: NextResponse }> {
   const email = await getAdminEmail();
-  if (!email) throw new Response("forbidden", { status: 403 });
-  return email;
+  if (!email) {
+    return { email: null, denied: NextResponse.json({ error: "forbidden" }, { status: 403 }) };
+  }
+  return { email, denied: null };
 }

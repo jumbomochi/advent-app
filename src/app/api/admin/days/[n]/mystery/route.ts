@@ -11,7 +11,8 @@ type MediaConfig = {
 };
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ n: string }> }) {
-  await requireAdmin();
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
   const n = Number((await ctx.params).n);
   const form = await req.formData();
   const closeUp = form.get("close_up");

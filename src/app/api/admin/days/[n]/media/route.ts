@@ -6,7 +6,8 @@ const MAX_BYTES = 200 * 1024 * 1024;
 const ALLOWED = ["video/mp4", "video/webm", "video/quicktime"];
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ n: string }> }) {
-  await requireAdmin();
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
   const n = Number((await ctx.params).n);
   const form = await req.formData();
   const file = form.get("file");
