@@ -17,7 +17,10 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ n: string
     return NextResponse.json({ error: "jigsaw piece not placed yet" }, { status: 400 });
   }
 
-  await sb.from("sticker_completions").upsert({ day_number: n });
+  const { error } = await sb.from("sticker_completions").upsert({ day_number: n });
+  if (error) {
+    return NextResponse.json({ error: "db", detail: error.message }, { status: 500 });
+  }
   await sb.from("audit_log").insert({ actor: "kid", action: "collected_sticker", payload: { day: n } });
   return NextResponse.json({ ok: true });
 }
