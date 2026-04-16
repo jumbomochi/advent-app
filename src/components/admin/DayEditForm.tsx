@@ -264,7 +264,9 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
       </div>
 
       <form onSubmit={add} className="grid gap-3 pt-3 border-t border-neutral-200">
-        <div className="text-xs font-semibold text-neutral-700">Add a new pair (photo {photosCount + 1} of 3)</div>
+        <div className="text-xs font-semibold text-neutral-700">
+          {photosCount >= 3 ? "All 3 pairs uploaded. Add more if you like." : `Add pair ${photosCount + 1} of 3 (each pair = 1 option the kid can pick)`}
+        </div>
 
         <label className="grid gap-1">
           <span className="text-xs font-medium">Close-up photo</span>
