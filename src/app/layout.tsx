@@ -16,8 +16,8 @@ const body = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Where's Daddy?",
-  description: "9 days of surprises while Daddy's away.",
+  title: "Where's Papa?",
+  description: "9 days of surprises while Papa's away.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

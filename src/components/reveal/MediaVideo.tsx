@@ -5,7 +5,7 @@ export function MediaVideo({
 }: { src: string | null; onContinue: () => void }) {
   return (
     <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
-      <h2 className="font-display text-3xl text-center text-accent">A message from Daddy</h2>
+      <h2 className="font-display text-3xl text-center text-accent">A message from Papa</h2>
       {src ? (
         <video
           src={src}
@@ -16,7 +16,7 @@ export function MediaVideo({
         />
       ) : (
         <div className="aspect-video rounded-2xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body">
-          Daddy&apos;s surprise is coming soon 💌
+          Papa&apos;s surprise is coming soon 💌
         </div>
       )}
       <button

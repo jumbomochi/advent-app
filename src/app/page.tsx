@@ -44,7 +44,7 @@ export default async function Home() {
     <main className="min-h-screen p-4 pb-10">
       <header className="flex items-center max-w-md mx-auto gap-2">
         <Image src="/brand/logo.png" alt="" width={36} height={36} priority className="shrink-0" />
-        <h1 className="font-display text-2xl sm:text-3xl text-accent flex-1 min-w-0 truncate">Where&apos;s Daddy?</h1>
+        <h1 className="font-display text-2xl sm:text-3xl text-accent flex-1 min-w-0 truncate">Where&apos;s Papa?</h1>
         <span className="px-2 py-1 rounded-full border-[2px] border-ink bg-sun font-display text-base shadow-[2px_2px_0_var(--color-ink)] shrink-0">
           ⭐{totalPoints}
         </span>
@@ -60,7 +60,7 @@ export default async function Home() {
       )}
 
       <section className="mt-4">
-        <h2 className="font-display text-2xl text-center mb-2 text-accent">Daddy&apos;s Journey</h2>
+        <h2 className="font-display text-2xl text-center mb-2 text-accent">Papa&apos;s Journey</h2>
         <TripMapJigsaw state={jigsawState} />
       </section>
 

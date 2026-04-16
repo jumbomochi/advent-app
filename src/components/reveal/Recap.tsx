@@ -83,7 +83,7 @@ export function Recap({
 
       <div className="pt-2">
         <div className="text-xs font-body uppercase tracking-wide opacity-60 mb-2 text-center">
-          Daddy&apos;s message
+          Papa&apos;s message
         </div>
         <MediaPreview mediaType={mediaType} src={mediaSignedUrl} config={mediaConfig} />
       </div>
@@ -119,7 +119,7 @@ function MediaPreview({
     if (!src) {
       return (
         <div className="aspect-video rounded-xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body text-sm">
-          Daddy&apos;s surprise is coming soon 💌
+          Papa&apos;s surprise is coming soon 💌
         </div>
       );
     }
@@ -154,7 +154,7 @@ function MediaPreview({
     if (photos.length === 0) {
       return (
         <div className="aspect-video rounded-xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body text-sm">
-          Daddy&apos;s mystery photos are coming soon 💌
+          Papa&apos;s mystery photos are coming soon 💌
         </div>
       );
     }

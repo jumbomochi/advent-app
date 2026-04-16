@@ -17,9 +17,9 @@ export function MediaMystery({
   if (noPhotos) {
     return (
       <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
-        <h2 className="font-display text-3xl text-center text-accent">What is Daddy looking at?</h2>
+        <h2 className="font-display text-3xl text-center text-accent">What is Papa looking at?</h2>
         <div className="aspect-video rounded-2xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body">
-          Daddy&apos;s mystery photos are coming soon 💌
+          Papa&apos;s mystery photos are coming soon 💌
         </div>
         <button
           onClick={onContinue}
@@ -33,7 +33,7 @@ export function MediaMystery({
 
   return (
     <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
-      <h2 className="font-display text-3xl text-center text-accent">What is Daddy looking at?</h2>
+      <h2 className="font-display text-3xl text-center text-accent">What is Papa looking at?</h2>
       <div className="grid grid-cols-3 gap-2">
         {photos.map((p, i) => {
           const src = revealed && i === correctIndex ? p.full_signed_url : p.close_up_signed_url;

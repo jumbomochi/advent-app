@@ -11,7 +11,7 @@ export function MediaPostcard({
 
   return (
     <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
-      <h2 className="font-display text-3xl text-center text-accent">A postcard from Daddy</h2>
+      <h2 className="font-display text-3xl text-center text-accent">A postcard from Papa</h2>
       <div
         className="aspect-[4/3] rounded-2xl p-6 flex flex-col justify-between border-[3px] border-ink shadow-[5px_5px_0_var(--color-ink)] text-white"
         style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
