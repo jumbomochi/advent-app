@@ -75,11 +75,45 @@ export function DayEditForm({ day }: { day: Day }) {
     }
 
     if (mediaFile) {
-      const fd = new FormData();
-      fd.append("file", mediaFile);
-      const r2 = await fetch(`/api/admin/days/${day.day_number}/media`, { method: "POST", body: fd });
-      if (!r2.ok) {
-        setStatus("Saved fields, but media upload failed");
+      const MAX = 200 * 1024 * 1024;
+      if (mediaFile.size > MAX) {
+        setStatus("Saved fields, but video is over 200MB");
+        setSaving(false);
+        return;
+      }
+      setStatus("Preparing upload…");
+      const signRes = await fetch(`/api/admin/days/${day.day_number}/media`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ contentType: mediaFile.type }),
+      });
+      if (!signRes.ok) {
+        const err = await signRes.json().catch(() => ({}));
+        setStatus(`Saved fields, but sign failed: ${err.error ?? signRes.status}`);
+        setSaving(false);
+        return;
+      }
+      const { signedUrl, path } = await signRes.json();
+
+      setStatus("Uploading video…");
+      const putRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "content-type": mediaFile.type, "x-upsert": "true" },
+        body: mediaFile,
+      });
+      if (!putRes.ok) {
+        setStatus(`Saved fields, but upload failed: ${putRes.status}`);
+        setSaving(false);
+        return;
+      }
+
+      const confirmRes = await fetch(`/api/admin/days/${day.day_number}/media`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ path }),
+      });
+      if (!confirmRes.ok) {
+        setStatus("Uploaded, but confirm failed");
         setSaving(false);
         return;
       }
