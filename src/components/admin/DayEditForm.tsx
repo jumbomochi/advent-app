@@ -230,37 +230,68 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
     else alert("Upload failed");
   }
 
+  const photosCount = current.photos?.length ?? 0;
+  const hasCorrect = typeof current.correct_index === "number";
+
   return (
-    <div className="border border-neutral-200 rounded p-3 bg-white grid gap-2">
-      <h3 className="font-semibold text-sm">Mystery photos</h3>
-      {current.photos && current.photos.length > 0 ? (
-        <ul className="text-xs text-neutral-600 list-disc ml-4">
-          {current.photos.map((p, i) => (
-            <li key={i}>
-              {p.label} {current.correct_index === i && <strong>(correct)</strong>}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-xs text-neutral-500">No photos yet. Add 3.</p>
-      )}
-      <form onSubmit={add} className="grid gap-2 mt-2">
-        <label className="text-xs">Close-up photo
-          <input type="file" accept="image/*" onChange={(e) => setCloseUp(e.target.files?.[0] ?? null)} className="text-xs block" />
+    <div className="border border-neutral-200 rounded p-4 bg-white grid gap-4">
+      <div>
+        <h3 className="font-semibold text-sm mb-1">Mystery photos</h3>
+        <p className="text-xs text-neutral-500 leading-relaxed">
+          After solving the riddle, the kid sees 3 close-up thumbnails and taps the one matching the answer.
+          The correct pick swaps to a full-view photo. Upload <strong>close-up + full-view</strong> pairs for each option.
+          <strong> Mark exactly one as correct.</strong>
+        </p>
+      </div>
+
+      <div>
+        <div className="text-xs font-medium text-neutral-600 mb-2">
+          Uploaded: {photosCount}/3 {photosCount > 0 && !hasCorrect && <span className="text-amber-600">· ⚠ no correct marked yet</span>}
+        </div>
+        {photosCount === 0 ? (
+          <p className="text-xs text-neutral-400 italic">No pairs uploaded yet.</p>
+        ) : (
+          <ul className="grid gap-2">
+            {current.photos!.map((p, i) => (
+              <li key={i} className={`flex items-center gap-2 p-2 rounded border ${current.correct_index === i ? "border-emerald-400 bg-emerald-50" : "border-neutral-200"}`}>
+                <span className="text-xs font-medium w-6 text-center">{i + 1}</span>
+                <span className="flex-1 text-sm">{p.label}</span>
+                {current.correct_index === i && <span className="text-xs text-emerald-700 font-semibold">✓ correct</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <form onSubmit={add} className="grid gap-3 pt-3 border-t border-neutral-200">
+        <div className="text-xs font-semibold text-neutral-700">Add a new pair (photo {photosCount + 1} of 3)</div>
+
+        <label className="grid gap-1">
+          <span className="text-xs font-medium">Close-up photo</span>
+          <span className="text-xs text-neutral-500 italic">Zoom-in/detail shot. What the kid sees in the thumbnail before picking.</span>
+          <input type="file" accept="image/*" onChange={(e) => setCloseUp(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
         </label>
-        <label className="text-xs">Full-view photo
-          <input type="file" accept="image/*" onChange={(e) => setFull(e.target.files?.[0] ?? null)} className="text-xs block" />
+
+        <label className="grid gap-1">
+          <span className="text-xs font-medium">Full-view photo</span>
+          <span className="text-xs text-neutral-500 italic">The big reveal — shown when kid taps the correct photo. (Still useful even for wrong options — they see it on the recap page.)</span>
+          <input type="file" accept="image/*" onChange={(e) => setFull(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
         </label>
-        <label className="text-xs grid gap-1">Label
-          <input value={label} onChange={(e) => setLabel(e.target.value)} className="bg-white border border-neutral-300 rounded p-1 text-sm" />
+
+        <label className="grid gap-1">
+          <span className="text-xs font-medium">Label</span>
+          <span className="text-xs text-neutral-500 italic">Shown under the photo on reveal (e.g. "Bellagio", "The Sphere").</span>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Bellagio" className="bg-white border border-neutral-300 rounded p-2 text-sm mt-1" />
         </label>
-        <label className="text-xs inline-flex items-center gap-1">
+
+        <label className="text-xs inline-flex items-center gap-2 p-2 rounded bg-neutral-50 border border-neutral-200">
           <input type="checkbox" checked={correct} onChange={(e) => setCorrect(e.target.checked)} />
-          This is the correct answer
+          <span><strong>This is the correct answer</strong> (only one of the 3 should be correct — this will replace any previous mark)</span>
         </label>
+
         <button type="submit" disabled={busy || !closeUp || !full || !label}
-          className="px-3 py-1 rounded bg-blue-600 text-white text-sm font-medium disabled:opacity-50 self-start">
-          {busy ? "Uploading…" : "Add photo"}
+          className="px-4 py-2 rounded bg-blue-600 text-white text-sm font-medium disabled:opacity-50 self-start">
+          {busy ? "Uploading…" : "Add pair"}
         </button>
       </form>
     </div>
