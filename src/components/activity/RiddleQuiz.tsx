@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { PuzzleImage } from "@/components/PuzzleImage";
 
 export function RiddleQuiz({
   dayNumber, title, body, onSolved,
@@ -34,6 +35,7 @@ export function RiddleQuiz({
     <div className="max-w-sm mx-auto p-4 grid gap-4 animate-fade-up">
       <h2 className="font-display text-4xl text-accent text-center">{title}</h2>
       <p className="font-body text-lg whitespace-pre-wrap leading-relaxed">{body}</p>
+      <PuzzleImage dayNumber={dayNumber} />
       <form onSubmit={submit} className={`grid gap-3 ${shaking ? "animate-shake" : ""}`}>
         <input
           value={answer}

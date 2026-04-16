@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { PuzzleImage } from "@/components/PuzzleImage";
 
 type ActivityType = "riddle" | "quiz" | "creative" | "kindness";
 type MediaType = "video" | "mystery_photos" | "animated_postcard" | "montage";
@@ -55,6 +56,7 @@ export function Recap({
       </div>
       <h2 className="font-display text-3xl text-center text-accent">{title}</h2>
       <p className="font-body text-base whitespace-pre-wrap leading-relaxed">{body}</p>
+      <PuzzleImage dayNumber={dayNumber} />
 
       {(activityType === "riddle" || activityType === "quiz") && correctAnswer && (
         <div className="p-3 rounded-xl bg-white border-[3px] border-ink shadow-[3px_3px_0_var(--color-ink)]">
