@@ -1,5 +1,11 @@
 "use client";
 import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseBrowser = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
 
 type Day = {
   day_number: number;
@@ -93,16 +99,14 @@ export function DayEditForm({ day }: { day: Day }) {
         setSaving(false);
         return;
       }
-      const { signedUrl, path } = await signRes.json();
+      const { token, path } = await signRes.json();
 
       setStatus("Uploading video…");
-      const putRes = await fetch(signedUrl, {
-        method: "PUT",
-        headers: { "content-type": mediaFile.type, "x-upsert": "true" },
-        body: mediaFile,
-      });
-      if (!putRes.ok) {
-        setStatus(`Saved fields, but upload failed: ${putRes.status}`);
+      const { error: upErr } = await supabaseBrowser.storage
+        .from("media")
+        .uploadToSignedUrl(path, token, mediaFile, { contentType: mediaFile.type });
+      if (upErr) {
+        setStatus(`Saved fields, but upload failed: ${upErr.message}`);
         setSaving(false);
         return;
       }
