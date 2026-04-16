@@ -8,6 +8,7 @@ import { MediaVideo } from "@/components/reveal/MediaVideo";
 import { MediaMystery } from "@/components/reveal/MediaMystery";
 import { MediaPostcard } from "@/components/reveal/MediaPostcard";
 import { JigsawPieceStep } from "@/components/reveal/JigsawPieceStep";
+import { StickerCollectStep } from "@/components/reveal/StickerCollectStep";
 import { CouponStep } from "@/components/reveal/CouponStep";
 import { BigSurpriseStep } from "@/components/reveal/BigSurpriseStep";
 import { Recap } from "@/components/reveal/Recap";
@@ -23,6 +24,7 @@ type DayPayload = {
   media_type: MediaType;
   completed: boolean;
   kid_tile_completed: boolean;
+  sticker_collected: boolean;
 };
 
 type Photo = { label: string; close_up_signed_url?: string; full_signed_url?: string };
@@ -48,7 +50,7 @@ type RevealPayload = {
   photo_signed_url: string | null;
 };
 
-type Step = "loading" | "activity" | "recap" | "media" | "jigsaw" | "coupon" | "big_surprise" | "done";
+type Step = "loading" | "activity" | "recap" | "media" | "jigsaw" | "sticker" | "coupon" | "big_surprise" | "done";
 
 export default function DayPage() {
   const params = useParams<{ n: string }>();
@@ -126,7 +128,7 @@ export default function DayPage() {
           couponText={reveal.coupon_text}
           points={reveal.points}
           kidTileCompleted={day.kid_tile_completed}
-          onContinue={() => setStep("jigsaw")}
+          onContinue={() => setStep(day.kid_tile_completed ? (day.sticker_collected ? "coupon" : "sticker") : "jigsaw")}
         />
       )}
 
@@ -164,7 +166,11 @@ export default function DayPage() {
       )}
 
       {step === "jigsaw" && reveal && (
-        <JigsawPieceStep dayNumber={n} onPlaced={() => setStep("coupon")} />
+        <JigsawPieceStep dayNumber={n} onPlaced={() => setStep("sticker")} />
+      )}
+
+      {step === "sticker" && reveal && (
+        <StickerCollectStep dayNumber={n} onCollected={() => setStep("coupon")} />
       )}
 
       {step === "coupon" && reveal && (

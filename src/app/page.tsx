@@ -16,10 +16,11 @@ export default async function Home() {
   await headers(); // force dynamic rendering
 
   const sb = adminClient();
-  const [{ data: days }, { data: completions }, { data: tiles }] = await Promise.all([
+  const [{ data: days }, { data: completions }, { data: tiles }, { data: stickers }] = await Promise.all([
     sb.from("days").select("day_number,date,unlock_at,points").order("day_number"),
     sb.from("completions").select("day_number"),
     sb.from("kid_tile_completions").select("day_number"),
+    sb.from("sticker_completions").select("day_number"),
   ]);
 
   const doneSet = new Set((completions ?? []).map((r) => r.day_number));
@@ -40,6 +41,9 @@ export default async function Home() {
 
   const jigsawState = Array.from({ length: TOTAL_DAYS }, (_, i) =>
     (tiles ?? []).some((r) => r.day_number === i + 1),
+  );
+  const stickerState = Array.from({ length: TOTAL_DAYS }, (_, i) =>
+    (stickers ?? []).some((r) => r.day_number === i + 1),
   );
 
   const completedCount = doneSet.size;
@@ -86,7 +90,7 @@ export default async function Home() {
         <TripMapJigsaw state={jigsawState} />
       </section>
 
-      <SisterStickerBook placed={jigsawState} />
+      <SisterStickerBook placed={stickerState} />
 
       <CouponInventory />
     </main>

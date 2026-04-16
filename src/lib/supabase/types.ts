@@ -227,6 +227,29 @@ export type Database = {
         }
         Relationships: []
       }
+      sticker_completions: {
+        Row: {
+          collected_at: string
+          day_number: number
+        }
+        Insert: {
+          collected_at?: string
+          day_number: number
+        }
+        Update: {
+          collected_at?: string
+          day_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sticker_completions_day_number_fkey"
+            columns: ["day_number"]
+            isOneToOne: true
+            referencedRelation: "days"
+            referencedColumns: ["day_number"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

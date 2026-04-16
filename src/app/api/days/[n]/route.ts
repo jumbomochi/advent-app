@@ -23,6 +23,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
 
   const { data: completion } = await sb.from("completions").select("day_number,completed_at").eq("day_number", n).maybeSingle();
   const { data: tile } = await sb.from("kid_tile_completions").select("day_number").eq("day_number", n).maybeSingle();
+  const { data: sticker } = await sb.from("sticker_completions").select("day_number").eq("day_number", n).maybeSingle();
 
   return NextResponse.json({
     day_number: day.day_number,
@@ -33,5 +34,6 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
     media_type: day.media_type,
     completed: !!completion,
     kid_tile_completed: !!tile,
+    sticker_collected: !!sticker,
   });
 }
