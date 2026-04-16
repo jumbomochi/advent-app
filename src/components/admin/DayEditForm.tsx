@@ -104,6 +104,13 @@ export function DayEditForm({ day }: { day: Day }) {
     else alert("Reset failed");
   }
 
+  async function removeVideo() {
+    if (!confirm("Remove the uploaded video for Day " + day.day_number + "?")) return;
+    const r = await fetch(`/api/admin/days/${day.day_number}/media`, { method: "DELETE" });
+    if (r.ok) window.location.reload();
+    else alert("Remove failed");
+  }
+
   const field = "w-full bg-white border border-neutral-300 rounded p-2";
 
   return (
@@ -162,9 +169,17 @@ export function DayEditForm({ day }: { day: Day }) {
       {(form.media_type === "video" || form.media_type === "montage") && (
         <div className="border border-neutral-200 rounded p-3 bg-white">
           <h3 className="font-semibold text-sm mb-2">Video file</h3>
-          <p className="text-xs text-neutral-500 mb-2">
-            Current: {day.media_storage_path ?? <em>none uploaded</em>}
-          </p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-xs text-neutral-500">
+              Current: {day.media_storage_path ?? <em>none uploaded</em>}
+            </p>
+            {day.media_storage_path && (
+              <button type="button" onClick={removeVideo}
+                className="px-2 py-0.5 rounded bg-red-600 text-white text-xs font-medium">
+                Remove
+              </button>
+            )}
+          </div>
           <input type="file" accept="video/mp4,video/webm,video/quicktime"
             onChange={(e) => setMediaFile(e.target.files?.[0] ?? null)}
             className="text-sm" />

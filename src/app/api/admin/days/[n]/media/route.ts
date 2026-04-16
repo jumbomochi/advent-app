@@ -23,3 +23,19 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ n: string 
   await sb.from("days").update({ media_storage_path: path }).eq("day_number", n);
   return NextResponse.json({ ok: true, path });
 }
+
+export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ n: string }> }) {
+  const { denied } = await requireAdmin();
+  if (denied) return denied;
+  const n = Number((await ctx.params).n);
+  const sb = adminClient();
+
+  const { data: day } = await sb.from("days").select("media_storage_path").eq("day_number", n).single();
+  const current = day?.media_storage_path;
+  if (current) {
+    await sb.storage.from("media").remove([current]);
+  }
+  const { error } = await sb.from("days").update({ media_storage_path: null }).eq("day_number", n);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true });
+}
