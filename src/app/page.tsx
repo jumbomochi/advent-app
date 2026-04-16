@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { CouponInventory } from "@/components/CouponInventory";
 import { adminClient } from "@/lib/supabase/admin";
 import { TOTAL_DAYS } from "@/lib/constants";
+import { currentBadge, nextBadge } from "@/lib/badges";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,11 @@ export default async function Home() {
     (tiles ?? []).some((r) => r.day_number === i + 1),
   );
 
+  const completedCount = doneSet.size;
+  const badge = currentBadge(totalPoints, completedCount);
+  const next = nextBadge(totalPoints, completedCount);
+  const pointsToNext = next ? Math.max(0, next.threshold - totalPoints) : 0;
+
   return (
     <main className="min-h-screen p-4 pb-10">
       <header className="flex items-center max-w-md mx-auto gap-2">
@@ -50,6 +56,21 @@ export default async function Home() {
         </span>
         <LogoutButton />
       </header>
+
+      {(badge || next) && (
+        <div className="max-w-md mx-auto mt-3 flex items-center justify-center gap-2 flex-wrap">
+          {badge && (
+            <span className="px-3 py-1 rounded-full border-[2px] border-ink bg-orchid font-display text-sm shadow-[2px_2px_0_var(--color-ink)]">
+              {badge.emoji} {badge.label}
+            </span>
+          )}
+          {next && pointsToNext > 0 && (
+            <span className="font-body text-xs opacity-70">
+              {pointsToNext} ⭐ to {next.label} {next.emoji}
+            </span>
+          )}
+        </div>
+      )}
 
       <DoorGrid doors={doors} todayNumber={todayNumber} />
 
