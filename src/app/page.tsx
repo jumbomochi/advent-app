@@ -5,6 +5,7 @@ import { TripMapJigsaw } from "@/components/TripMapJigsaw";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { LogoutButton } from "@/components/LogoutButton";
 import { CouponInventory } from "@/components/CouponInventory";
+import { SisterStickerBook } from "@/components/SisterStickerBook";
 import { adminClient } from "@/lib/supabase/admin";
 import { TOTAL_DAYS } from "@/lib/constants";
 import { currentBadge, nextBadge } from "@/lib/badges";
@@ -84,6 +85,8 @@ export default async function Home() {
         <h2 className="font-display text-2xl text-center mb-2 text-accent">Papa&apos;s Journey</h2>
         <TripMapJigsaw state={jigsawState} />
       </section>
+
+      <SisterStickerBook placed={jigsawState} />
 
       <CouponInventory />
     </main>
