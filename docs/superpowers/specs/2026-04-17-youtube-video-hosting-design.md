@@ -133,7 +133,15 @@ export function MediaVideo({
 
 `src/app/day/[n]/page.tsx`:
 
-- Pass `youtubeId={reveal.media_youtube_id}` instead of `src={reveal.media_signed_url}`.
+- Update the local `RevealPayload` type: `media_signed_url` → `media_youtube_id`.
+- Pass `youtubeId={reveal.media_youtube_id}` to `MediaVideo` instead of `src={reveal.media_signed_url}`.
+- Update the `Recap` prop name (see next).
+
+`src/components/reveal/Recap.tsx`:
+
+- The inner `MediaPreview` also renders the video (with `<video src=...>`) for the recap view. Update its `video`/`montage` branch to render the same click-to-play YouTube embed as `MediaVideo`.
+- Rename the prop `mediaSignedUrl: string | null` → `mediaYoutubeId: string | null` throughout `Recap` and `MediaPreview`.
+- Extract the YouTube embed rendering into a shared subcomponent (inside `MediaVideo.tsx`) exported as `YouTubeEmbed` so both `MediaVideo` and `Recap`'s `MediaPreview` can use it. Keeps behavior identical between the first-watch view and the recap view.
 
 ### Cleanup
 
@@ -147,11 +155,9 @@ export function MediaVideo({
 
 - `src/lib/youtube.test.ts` — 5 cases: each of the 4 accepted URL formats plus a rejection case ("not-a-url").
 
-**E2E (Playwright):**
+**Manual verification:**
 
-- Admin test: load `/admin/day/1`, paste a `youtu.be/<id>` URL into the new text field, save, assert the ID renders in "Current" after reload.
-- Reveal test: seed a day with `media_youtube_id`, walk through to the video step, assert the thumbnail renders, click it, assert the iframe mounts with the correct `src`.
-- Remove the existing test that exercises file upload (if any). If none exists, no test deletion needed.
+The project has no E2E test suite yet (only `tests/unit/`). Verify by running `pnpm dev`, signing in as admin, saving a YouTube URL on a day, then signing in as the kid and walking through the reveal flow. Confirm the thumbnail renders, a tap mounts the iframe, the video plays, and the Recap page shows the same embed after completion.
 
 ## Out of scope
 
