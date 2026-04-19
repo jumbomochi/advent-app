@@ -39,9 +39,9 @@ export default async function AdminHome() {
               </div>
             </div>
             <div className="flex gap-2 text-xs shrink-0">
-              {d.media_storage_path
-                ? <span className="px-2 py-1 rounded bg-emerald-100 text-emerald-800">media ✓</span>
-                : <span className="px-2 py-1 rounded bg-amber-100 text-amber-800">no media</span>}
+              {d.media_youtube_id
+                ? <span className="px-2 py-1 rounded bg-emerald-100 text-emerald-800">video ✓</span>
+                : <span className="px-2 py-1 rounded bg-amber-100 text-amber-800">no video</span>}
               {doneSet.has(d.day_number) && <span className="px-2 py-1 rounded bg-blue-100 text-blue-800">done</span>}
             </div>
           </Link>
