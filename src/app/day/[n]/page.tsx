@@ -31,7 +31,7 @@ type Photo = { label: string; close_up_signed_url?: string; full_signed_url?: st
 
 type RevealPayload = {
   media_type: MediaType;
-  media_signed_url: string | null;
+  media_youtube_id: string | null;
   media_config: {
     photos?: Photo[];
     correct_index?: number;
@@ -123,7 +123,7 @@ export default function DayPage() {
           correctAnswer={reveal.correct_answer_canonical}
           photoUrl={reveal.photo_signed_url}
           mediaType={reveal.media_type}
-          mediaSignedUrl={reveal.media_signed_url}
+          mediaYoutubeId={reveal.media_youtube_id}
           mediaConfig={reveal.media_config}
           couponText={reveal.coupon_text}
           points={reveal.points}
@@ -149,7 +149,7 @@ export default function DayPage() {
       {step === "media" && reveal && (
         <>
           {(reveal.media_type === "video" || reveal.media_type === "montage") && (
-            <MediaVideo src={reveal.media_signed_url} onContinue={() => setStep("jigsaw")} />
+            <MediaVideo youtubeId={reveal.media_youtube_id} onContinue={() => setStep("jigsaw")} />
           )}
           {reveal.media_type === "mystery_photos" && (
             <MediaMystery
