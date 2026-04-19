@@ -1,11 +1,5 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseBrowser = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 type Day = {
   day_number: number;
@@ -18,7 +12,7 @@ type Day = {
   media_type: string;
   coupon_text: string;
   points: number;
-  media_storage_path: string | null;
+  media_youtube_id: string | null;
   media_config: unknown;
 };
 
@@ -47,7 +41,9 @@ export function DayEditForm({ day }: { day: Day }) {
     coupon_text: day.coupon_text,
     points: day.points,
   });
-  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState(
+    day.media_youtube_id ? `https://youtu.be/${day.media_youtube_id}` : "",
+  );
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -57,6 +53,8 @@ export function DayEditForm({ day }: { day: Day }) {
     e.preventDefault();
     setSaving(true);
     setStatus("Saving…");
+
+    const includeYoutube = form.media_type === "video" || form.media_type === "montage";
 
     const patch: Record<string, unknown> = {
       activity_type: form.activity_type,
@@ -68,59 +66,20 @@ export function DayEditForm({ day }: { day: Day }) {
       coupon_text: form.coupon_text,
       points: form.points,
     };
+    if (includeYoutube) {
+      patch.media_youtube_url = youtubeUrl.trim();
+    }
 
-    const r1 = await fetch(`/api/admin/days/${day.day_number}`, {
+    const res = await fetch(`/api/admin/days/${day.day_number}`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(patch),
     });
-    if (!r1.ok) {
-      setStatus("Save failed");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setStatus(`Save failed: ${err.error ?? res.status}`);
       setSaving(false);
       return;
-    }
-
-    if (mediaFile) {
-      const MAX = 200 * 1024 * 1024;
-      if (mediaFile.size > MAX) {
-        setStatus("Saved fields, but video is over 200MB");
-        setSaving(false);
-        return;
-      }
-      setStatus("Preparing upload…");
-      const signRes = await fetch(`/api/admin/days/${day.day_number}/media`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ contentType: mediaFile.type }),
-      });
-      if (!signRes.ok) {
-        const err = await signRes.json().catch(() => ({}));
-        setStatus(`Saved fields, but sign failed: ${err.error ?? signRes.status}`);
-        setSaving(false);
-        return;
-      }
-      const { token, path } = await signRes.json();
-
-      setStatus("Uploading video…");
-      const { error: upErr } = await supabaseBrowser.storage
-        .from("media")
-        .uploadToSignedUrl(path, token, mediaFile, { contentType: mediaFile.type });
-      if (upErr) {
-        setStatus(`Saved fields, but upload failed: ${upErr.message}`);
-        setSaving(false);
-        return;
-      }
-
-      const confirmRes = await fetch(`/api/admin/days/${day.day_number}/media`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ path }),
-      });
-      if (!confirmRes.ok) {
-        setStatus("Uploaded, but confirm failed");
-        setSaving(false);
-        return;
-      }
     }
 
     setStatus("Saved");
@@ -143,8 +102,12 @@ export function DayEditForm({ day }: { day: Day }) {
   }
 
   async function removeVideo() {
-    if (!confirm("Remove the uploaded video for Day " + day.day_number + "?")) return;
-    const r = await fetch(`/api/admin/days/${day.day_number}/media`, { method: "DELETE" });
+    if (!confirm("Remove the YouTube video for Day " + day.day_number + "?")) return;
+    const r = await fetch(`/api/admin/days/${day.day_number}`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ media_youtube_url: null }),
+    });
     if (r.ok) window.location.reload();
     else alert("Remove failed");
   }
@@ -205,23 +168,30 @@ export function DayEditForm({ day }: { day: Day }) {
       </Label>
 
       {(form.media_type === "video" || form.media_type === "montage") && (
-        <div className="border border-neutral-200 rounded p-3 bg-white">
-          <h3 className="font-semibold text-sm mb-2">Video file</h3>
-          <div className="flex items-center gap-2 mb-2">
+        <div className="border border-neutral-200 rounded p-3 bg-white grid gap-2">
+          <h3 className="font-semibold text-sm">YouTube video</h3>
+          <div className="flex items-center gap-2">
             <p className="text-xs text-neutral-500">
-              Current: {day.media_storage_path ?? <em>none uploaded</em>}
+              Current: {day.media_youtube_id
+                ? <a href={`https://youtu.be/${day.media_youtube_id}`} target="_blank" rel="noreferrer" className="underline">{day.media_youtube_id}</a>
+                : <em>none set</em>}
             </p>
-            {day.media_storage_path && (
+            {day.media_youtube_id && (
               <button type="button" onClick={removeVideo}
                 className="px-2 py-0.5 rounded bg-red-600 text-white text-xs font-medium">
                 Remove
               </button>
             )}
           </div>
-          <input type="file" accept="video/mp4,video/webm,video/quicktime"
-            onChange={(e) => setMediaFile(e.target.files?.[0] ?? null)}
-            className="text-sm" />
-          <p className="text-xs text-neutral-500 mt-1">Max 200MB. mp4/webm/mov.</p>
+          <input
+            type="url"
+            inputMode="url"
+            placeholder="https://youtu.be/…  (unlisted is fine)"
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
+            className="w-full bg-white border border-neutral-300 rounded p-2 text-sm"
+          />
+          <p className="text-xs text-neutral-500">Accepts youtube.com/watch, youtu.be, or /embed URLs. Unlisted videos work.</p>
         </div>
       )}
 
