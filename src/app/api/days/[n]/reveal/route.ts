@@ -48,12 +48,6 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
     ? day.activity_answer.split("|")[0] ?? null
     : null;
 
-  let media_signed_url: string | null = null;
-  if ((day.media_type === "video" || day.media_type === "montage") && day.media_storage_path) {
-    const { data } = await sb.storage.from("media").createSignedUrl(day.media_storage_path, SIGNED_URL_TTL);
-    media_signed_url = data?.signedUrl ?? null;
-  }
-
   const config: MediaConfig = (day.media_config as MediaConfig) ?? {};
   if (day.media_type === "mystery_photos" && Array.isArray(config.photos)) {
     for (const p of config.photos) {
@@ -76,7 +70,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ n: string 
 
   return NextResponse.json({
     media_type: day.media_type,
-    media_signed_url,
+    media_youtube_id: day.media_youtube_id,
     media_config: config,
     coupon_text: day.coupon_text,
     points: day.points,
