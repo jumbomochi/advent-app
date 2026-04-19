@@ -131,7 +131,7 @@ export type Database = {
           day_number: number
           expected_minutes: number
           media_config: Json
-          media_storage_path: string | null
+          media_youtube_id: string | null
           media_type: string
           points: number
           unlock_at: string
@@ -146,7 +146,7 @@ export type Database = {
           day_number: number
           expected_minutes?: number
           media_config?: Json
-          media_storage_path?: string | null
+          media_youtube_id?: string | null
           media_type: string
           points?: number
           unlock_at: string
@@ -161,7 +161,7 @@ export type Database = {
           day_number?: number
           expected_minutes?: number
           media_config?: Json
-          media_storage_path?: string | null
+          media_youtube_id?: string | null
           media_type?: string
           points?: number
           unlock_at?: string
