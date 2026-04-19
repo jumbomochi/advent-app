@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ n: string }
   if (!parsed.success) return NextResponse.json({ error: "bad body", details: parsed.error.issues }, { status: 400 });
 
   const { media_youtube_url, ...rest } = parsed.data;
-  const patch: TablesUpdate<"days"> = { ...rest };
+  const patch = { ...rest } as TablesUpdate<"days">;
 
   if (media_youtube_url !== undefined) {
     if (media_youtube_url === null || media_youtube_url === "") {
