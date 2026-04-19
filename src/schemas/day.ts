@@ -13,6 +13,7 @@ export const DayPatch = z.object({
   coupon_text: z.string().min(1).max(300).optional(),
   points: z.number().int().min(0).max(100).optional(),
   media_config: z.record(z.string(), z.unknown()).optional(),
+  media_youtube_url: z.string().max(200).nullable().optional(),
 });
 
 export const NewPinSchema = z.object({ new_pin: z.string().regex(/^\d{4}$/) });
