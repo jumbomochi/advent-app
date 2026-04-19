@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { PuzzleImage } from "@/components/PuzzleImage";
+import { YouTubeEmbed } from "@/components/reveal/MediaVideo";
 
 type ActivityType = "riddle" | "quiz" | "creative" | "kindness";
 type MediaType = "video" | "mystery_photos" | "animated_postcard" | "montage";
@@ -28,7 +29,7 @@ export function Recap({
   correctAnswer,
   photoUrl,
   mediaType,
-  mediaSignedUrl,
+  mediaYoutubeId,
   mediaConfig,
   couponText,
   points,
@@ -42,7 +43,7 @@ export function Recap({
   correctAnswer: string | null;
   photoUrl: string | null;
   mediaType: MediaType;
-  mediaSignedUrl: string | null;
+  mediaYoutubeId: string | null;
   mediaConfig: MediaConfig;
   couponText: string;
   points: number;
@@ -87,7 +88,7 @@ export function Recap({
         <div className="text-xs font-body uppercase tracking-wide opacity-60 mb-2 text-center">
           Papa&apos;s message
         </div>
-        <MediaPreview mediaType={mediaType} src={mediaSignedUrl} config={mediaConfig} />
+        <MediaPreview mediaType={mediaType} youtubeId={mediaYoutubeId} config={mediaConfig} />
       </div>
 
       <div className="p-4 rounded-2xl bg-sun text-ink border-[3px] border-ink shadow-[4px_4px_0_var(--color-ink)] text-center">
@@ -110,29 +111,22 @@ export function Recap({
 
 function MediaPreview({
   mediaType,
-  src,
+  youtubeId,
   config,
 }: {
   mediaType: MediaType;
-  src: string | null;
+  youtubeId: string | null;
   config: MediaConfig;
 }) {
   if (mediaType === "video" || mediaType === "montage") {
-    if (!src) {
+    if (!youtubeId) {
       return (
         <div className="aspect-video rounded-xl border-[3px] border-dashed border-ink bg-white grid place-items-center p-6 text-center font-body text-sm">
           Papa&apos;s surprise is coming soon 💌
         </div>
       );
     }
-    return (
-      <video
-        src={src}
-        controls
-        playsInline
-        className="w-full rounded-xl bg-black border-[3px] border-ink shadow-[3px_3px_0_var(--color-ink)]"
-      />
-    );
+    return <YouTubeEmbed youtubeId={youtubeId} className="rounded-xl shadow-[3px_3px_0_var(--color-ink)]" />;
   }
 
   if (mediaType === "animated_postcard") {
