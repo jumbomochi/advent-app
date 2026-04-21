@@ -6,14 +6,14 @@ export type Door = {
   date: string;
   unlock_at: string;
   completed: boolean;
+  unlocked: boolean;
 };
 
 export function DoorGrid({ doors, todayNumber }: { doors: Door[]; todayNumber: number }) {
-  const now = Date.now();
   return (
     <div className="grid grid-cols-3 gap-3 p-4 max-w-md mx-auto">
       {doors.map((d, idx) => {
-        const unlocked = new Date(d.unlock_at).getTime() <= now;
+        const unlocked = d.unlocked;
         const isToday = d.day_number === todayNumber;
         const state: "done" | "today" | "missed" | "locked" = d.completed
           ? "done"
@@ -52,7 +52,7 @@ export function DoorGrid({ doors, todayNumber }: { doors: Door[]; todayNumber: n
           <div className={`${baseClasses} ${stateClasses} ${todayRotation} ${interactive}`}>
             <div className="text-[clamp(28px,8vw,40px)] leading-none">{d.day_number}</div>
             <div className="text-[11px] opacity-70 mt-1 font-body font-medium">
-              {new Date(d.date).toLocaleDateString("en-SG", { weekday: "short" })}
+              {new Date(d.date).toLocaleDateString("en-SG", { weekday: "short", timeZone: "Asia/Singapore" })}
             </div>
             {state === "done" && <div className="absolute -top-1 -right-1 text-lg">✓</div>}
           </div>

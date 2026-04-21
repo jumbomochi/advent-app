@@ -37,6 +37,7 @@ export default async function Home() {
     date: d.date,
     unlock_at: d.unlock_at,
     completed: doneSet.has(d.day_number),
+    unlocked: new Date(d.unlock_at).getTime() <= now,
   }));
 
   const jigsawState = Array.from({ length: TOTAL_DAYS }, (_, i) =>

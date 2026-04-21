@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Day = {
   day_number: number;
@@ -31,6 +31,9 @@ type ParsedMediaConfig = {
 };
 
 export function DayEditForm({ day }: { day: Day }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [form, setForm] = useState({
     activity_type: day.activity_type,
     activity_title: day.activity_title,
@@ -113,6 +116,14 @@ export function DayEditForm({ day }: { day: Day }) {
   }
 
   const field = "w-full bg-white border border-neutral-300 rounded p-2";
+
+  if (!mounted) {
+    return (
+      <div className="grid gap-4 max-w-xl">
+        <div className="h-96 rounded bg-neutral-100 animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={save} className="grid gap-4 max-w-xl">
