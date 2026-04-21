@@ -266,8 +266,7 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
   const [correct, setCorrect] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
+  async function add() {
     if (!closeUp || !full || !label) return;
     setBusy(true);
     const fd = new FormData();
@@ -318,7 +317,7 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
         )}
       </div>
 
-      <form onSubmit={add} className="grid gap-3 pt-3 border-t border-neutral-200">
+      <div className="grid gap-3 pt-3 border-t border-neutral-200">
         <div className="text-xs font-semibold text-neutral-700">
           {photosCount >= 3 ? "All 3 pairs uploaded. Add more if you like." : `Add pair ${photosCount + 1} of 3 (each pair = 1 option the kid can pick)`}
         </div>
@@ -348,11 +347,11 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
           <span><strong>This is the correct answer</strong> (only one of the 3 should be correct — this will replace any previous mark)</span>
         </label>
 
-        <button type="submit" disabled={busy || !closeUp || !full || !label}
+        <button type="button" onClick={add} disabled={busy || !closeUp || !full || !label}
           className="px-4 py-2 rounded bg-blue-600 text-white text-sm font-medium disabled:opacity-50 self-start">
           {busy ? "Uploading…" : "Add pair"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }
