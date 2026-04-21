@@ -238,6 +238,18 @@ export function DayEditForm({ day }: { day: Day }) {
   );
 }
 
+function FileStatus({ file }: { file: File | null }) {
+  if (!file) {
+    return <span className="text-[11px] text-neutral-400 italic mt-1">No file picked yet</span>;
+  }
+  const kb = Math.round(file.size / 1024);
+  return (
+    <span className="text-[11px] text-emerald-700 mt-1">
+      ✓ {file.name} · {file.type || "unknown type"} · {kb} KB
+    </span>
+  );
+}
+
 function Label({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-1">
@@ -314,13 +326,15 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
         <label className="grid gap-1">
           <span className="text-xs font-medium">Close-up photo</span>
           <span className="text-xs text-neutral-500 italic">Zoom-in/detail shot. What the kid sees in the thumbnail before picking.</span>
-          <input type="file" accept="image/*" onChange={(e) => setCloseUp(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
+          <input type="file" accept="image/*,.heic,.heif" onChange={(e) => setCloseUp(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
+          <FileStatus file={closeUp} />
         </label>
 
         <label className="grid gap-1">
           <span className="text-xs font-medium">Full-view photo</span>
           <span className="text-xs text-neutral-500 italic">The big reveal — shown when kid taps the correct photo. (Still useful even for wrong options — they see it on the recap page.)</span>
-          <input type="file" accept="image/*" onChange={(e) => setFull(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
+          <input type="file" accept="image/*,.heic,.heif" onChange={(e) => setFull(e.target.files?.[0] ?? null)} className="text-xs block mt-1" />
+          <FileStatus file={full} />
         </label>
 
         <label className="grid gap-1">
