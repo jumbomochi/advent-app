@@ -50,7 +50,7 @@ type RevealPayload = {
   photo_signed_url: string | null;
 };
 
-type Step = "loading" | "activity" | "recap" | "media" | "jigsaw" | "sticker" | "coupon" | "big_surprise" | "done";
+type Step = "loading" | "activity" | "recap" | "media" | "post_video" | "jigsaw" | "sticker" | "coupon" | "big_surprise" | "done";
 
 export default function DayPage() {
   const params = useParams<{ n: string }>();
@@ -156,13 +156,17 @@ export default function DayPage() {
               photos={reveal.media_config.photos ?? []}
               correctIndex={reveal.media_config.correct_index ?? 0}
               funFact={reveal.media_config.fun_fact}
-              onContinue={() => setStep("jigsaw")}
+              onContinue={() => setStep(reveal.media_youtube_id ? "post_video" : "jigsaw")}
             />
           )}
           {reveal.media_type === "animated_postcard" && (
             <MediaPostcard config={reveal.media_config} onContinue={() => setStep("jigsaw")} />
           )}
         </>
+      )}
+
+      {step === "post_video" && reveal && (
+        <MediaVideo youtubeId={reveal.media_youtube_id} onContinue={() => setStep("jigsaw")} />
       )}
 
       {step === "jigsaw" && reveal && (

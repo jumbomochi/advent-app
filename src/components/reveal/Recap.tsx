@@ -175,6 +175,7 @@ function MediaPreview({
           </div>
         )}
         {config.fun_fact && <FunFact text={config.fun_fact} />}
+        {youtubeId && <YouTubeEmbed youtubeId={youtubeId} className="rounded-xl shadow-[3px_3px_0_var(--color-ink)]" />}
       </div>
     );
   }

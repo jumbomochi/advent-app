@@ -167,9 +167,14 @@ export function DayEditForm({ day }: { day: Day }) {
         <input value={form.coupon_text} onChange={(e) => setForm({ ...form, coupon_text: e.target.value })} className={field} />
       </Label>
 
-      {(form.media_type === "video" || form.media_type === "montage") && (
+      {(form.media_type === "video" || form.media_type === "montage" || form.media_type === "mystery_photos") && (
         <div className="border border-neutral-200 rounded p-3 bg-white grid gap-2">
-          <h3 className="font-semibold text-sm">YouTube video</h3>
+          <h3 className="font-semibold text-sm">
+            YouTube video
+            {form.media_type === "mystery_photos" && (
+              <span className="ml-2 text-xs font-normal text-neutral-500">(plays after the puzzle is solved)</span>
+            )}
+          </h3>
           <div className="flex items-center gap-2">
             <p className="text-xs text-neutral-500">
               Current: {day.media_youtube_id
@@ -249,8 +254,12 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
     fd.append("correct", correct ? "true" : "false");
     const res = await fetch(`/api/admin/days/${dayNumber}/mystery`, { method: "POST", body: fd });
     setBusy(false);
-    if (res.ok) window.location.reload();
-    else alert("Upload failed");
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      alert(`Upload failed: ${err.error ?? res.status}`);
+    }
   }
 
   const photosCount = current.photos?.length ?? 0;
