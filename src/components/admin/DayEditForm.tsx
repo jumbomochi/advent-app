@@ -265,22 +265,82 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
   const [label, setLabel] = useState("");
   const [correct, setCorrect] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<string>("");
+
+  async function uploadDirect(signedUrl: string, file: File): Promise<Response> {
+    return fetch(signedUrl, {
+      method: "PUT",
+      headers: {
+        "content-type": file.type || "application/octet-stream",
+        "x-upsert": "true",
+      },
+      body: file,
+    });
+  }
 
   async function add() {
     if (!closeUp || !full || !label) return;
     setBusy(true);
-    const fd = new FormData();
-    fd.append("close_up", closeUp);
-    fd.append("full", full);
-    fd.append("label", label);
-    fd.append("correct", correct ? "true" : "false");
-    const res = await fetch(`/api/admin/days/${dayNumber}/mystery`, { method: "POST", body: fd });
-    setBusy(false);
-    if (res.ok) {
-      window.location.reload();
-    } else {
-      const err = await res.json().catch(() => ({}));
-      alert(`Upload failed: ${err.error ?? res.status}`);
+    setProgress("Requesting upload URLs…");
+    try {
+      const signRes = await fetch(`/api/admin/days/${dayNumber}/mystery/sign`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          close_up: { name: closeUp.name, size: closeUp.size },
+          full: { name: full.name, size: full.size },
+        }),
+      });
+      if (!signRes.ok) {
+        const err = await signRes.json().catch(() => ({}));
+        alert(`Sign failed: ${err.error ?? signRes.status}`);
+        setBusy(false);
+        setProgress("");
+        return;
+      }
+      const { close_up: cInfo, full: fInfo } = await signRes.json();
+
+      setProgress("Uploading close-up to storage…");
+      const cUp = await uploadDirect(cInfo.signedUrl, closeUp);
+      if (!cUp.ok) {
+        alert(`Close-up upload failed: ${cUp.status} ${await cUp.text().catch(() => "")}`);
+        setBusy(false);
+        setProgress("");
+        return;
+      }
+
+      setProgress("Uploading full-view to storage…");
+      const fUp = await uploadDirect(fInfo.signedUrl, full);
+      if (!fUp.ok) {
+        alert(`Full upload failed: ${fUp.status} ${await fUp.text().catch(() => "")}`);
+        setBusy(false);
+        setProgress("");
+        return;
+      }
+
+      setProgress("Finalizing (converting HEIC if needed)…");
+      const finRes = await fetch(`/api/admin/days/${dayNumber}/mystery`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          close_up_path: cInfo.path,
+          full_path: fInfo.path,
+          label,
+          correct,
+        }),
+      });
+      if (finRes.ok) {
+        window.location.reload();
+      } else {
+        const err = await finRes.json().catch(() => ({}));
+        alert(`Finalize failed: ${err.error ?? finRes.status}`);
+        setBusy(false);
+        setProgress("");
+      }
+    } catch (e) {
+      alert(`Upload error: ${e instanceof Error ? e.message : "unknown"}`);
+      setBusy(false);
+      setProgress("");
     }
   }
 
@@ -347,10 +407,13 @@ function MysteryEditor({ dayNumber, current }: { dayNumber: number; current: Par
           <span><strong>This is the correct answer</strong> (only one of the 3 should be correct — this will replace any previous mark)</span>
         </label>
 
-        <button type="button" onClick={add} disabled={busy || !closeUp || !full || !label}
-          className="px-4 py-2 rounded bg-blue-600 text-white text-sm font-medium disabled:opacity-50 self-start">
-          {busy ? "Uploading…" : "Add pair"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={add} disabled={busy || !closeUp || !full || !label}
+            className="px-4 py-2 rounded bg-blue-600 text-white text-sm font-medium disabled:opacity-50 self-start">
+            {busy ? "Uploading…" : "Add pair"}
+          </button>
+          {progress && <span className="text-xs text-neutral-600">{progress}</span>}
+        </div>
       </div>
     </div>
   );
