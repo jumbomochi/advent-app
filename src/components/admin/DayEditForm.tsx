@@ -57,7 +57,10 @@ export function DayEditForm({ day }: { day: Day }) {
     setSaving(true);
     setStatus("Saving…");
 
-    const includeYoutube = form.media_type === "video" || form.media_type === "montage";
+    const includeYoutube =
+      form.media_type === "video" ||
+      form.media_type === "montage" ||
+      form.media_type === "mystery_photos";
 
     const patch: Record<string, unknown> = {
       activity_type: form.activity_type,
